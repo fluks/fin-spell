@@ -1,0 +1,37 @@
+{
+    "manifest_version": 2,
+    "name": "Fin Spell",
+    "version": "0.1.0",
+    "author": "fluks",
+
+    "applications": {
+        "gecko": {
+            "id": "finspell@fluks"
+        }
+    },
+
+    "content_scripts": [
+        {
+            "matches": [ "*://*/*" ],
+            "js": [
+                "content_scripts/jquery-3.3.1.min.js",
+                "content_scripts/jquery.highlight-within-textarea.js",
+                "content_scripts/content_script.js"
+            ],
+            "css": [ "content_scripts/jquery.highlight-within-textarea.css" ]
+        }
+    ],
+
+    "background": {
+        "scripts": [
+            "background/libvoikko.js",
+            "background/background.js"
+        ]
+    },
+
+    "permissions": [
+        "storage",
+        "<all_urls>",
+        "contextMenus"
+    ]
+}
