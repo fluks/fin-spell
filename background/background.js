@@ -1,8 +1,14 @@
+/** @module background */
+
 'use strict';
 
 const ROOTMENU_ID = 'rootmenu';
 
 /**
+ * @function spell
+ * @param voikko {Voikko}
+ * @param text {String}
+ * @returns {Object}
  */
 const spell = (voikko, text) => {
     return voikko.tokens(text).map(t => {
@@ -14,12 +20,17 @@ const spell = (voikko, text) => {
 };
 
 /**
+ * @function suggest
+ * @param voikko {Voikko}
+ * @param word {String}
+ * @returns {String[]}
  */
 const suggest = (voikko, word) => {
     return voikko.suggest(word);
 };
 
 /**
+ * @function createRootmenu
  */
 const createRootmenu = () => {
     chrome.contextMenus.create({
@@ -31,6 +42,7 @@ const createRootmenu = () => {
 };
 
 /**
+ * @function removeMenus
  */
 const removeMenus = () => {
     chrome.contextMenus.removeAll();
@@ -41,6 +53,11 @@ const removeMenus = () => {
 };
 
 /**
+ * @function handleClick
+ * @param info {}
+ * @param tab {tabs.Tab}
+ * @param word {String}
+ * @param sendResponse {Function}
  */
 const handleClick = (info, tab, word, sendResponse) => {
     removeMenus();
@@ -49,6 +66,12 @@ const handleClick = (info, tab, word, sendResponse) => {
 };
 
 /**
+ * @function listener
+ * @param request {Object}
+ * @param sender {}
+ * @param sendResponse {Function}
+ * @param voikko {Voikko}
+ * @returns {Bool|undefined}
  */
 const listener = (request, sender, sendResponse, voikko) => {
     let response = { data: { index: request.data.index, } };
@@ -84,6 +107,8 @@ const listener = (request, sender, sendResponse, voikko) => {
 };
 
 /**
+ * @function load
+ * @param libvoikko {Libvoikko}
  */
 const load = (libvoikko) => {
     const voikko = libvoikko.init('fi');

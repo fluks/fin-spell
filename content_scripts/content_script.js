@@ -1,6 +1,11 @@
+/** @module content_script */
+
 'use strict';
 
 /**
+ * @function isWordChar
+ * @param c {String}
+ * @returns {Bool}
  */
 const isWordChar = (c) => {
     const wordChar = /[a-zöäå-]/i;
@@ -8,6 +13,10 @@ const isWordChar = (c) => {
 };
 
 /**
+ * @function findWordStart
+ * @param s {String}
+ * @param index {Integer}
+ * @returns {Integer|undefined}
  */
 const findWordStart = (s, index) => {
     let first = undefined;
@@ -17,6 +26,10 @@ const findWordStart = (s, index) => {
 };
 
 /**
+ * @function findWordEnd
+ * @param s {String}
+ * @param index {Integer}
+ * @returns {Integer|undefined}
  */
 const findWordEnd = (s, index) => {
     let last = undefined;
@@ -26,6 +39,9 @@ const findWordEnd = (s, index) => {
 };
 
 /**
+ * @function findWord
+ * @param elem {HTMLElement}
+ * @returns {Array|undefined}
  */
 const findWord = (elem) => {
     const s = elem.value;
@@ -47,6 +63,9 @@ const findWord = (elem) => {
 };
 
 /**
+ * @function highligth
+ * @async
+ * @param ev {Event}
  */
 const highligth = async (ev) => {
     const res = await chrome.runtime.sendMessage({
@@ -70,6 +89,9 @@ const highligth = async (ev) => {
  * the word the cursor is on and show the menu and suggestions in it.
  * Change the word to a suggestion if wanted. Don't show if the word is
  * correct word.
+ * @function suggestWords
+ * @async
+ * @param ev {Event}
  */
 const suggestWords = async (ev) => {
     const [ word, first, last ] = findWord(ev.target);
@@ -86,7 +108,7 @@ const suggestWords = async (ev) => {
     let s = ev.target.value.slice(0, first) + res.data.word +
         ev.target.value.slice(last + 1);
     ev.target.value = s;
-    // TODO Rearrange highlights.
+
     highligth(ev);
 };
 
