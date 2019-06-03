@@ -42,7 +42,7 @@ const enableHighlight = async (tabId, enable, button) => {
         name: 'enable_highlight',
         enable: enable,
     });
-    if (res.enabled_highlight) {
+    if (res.hasOwnProperty('enabled_highlight')) {
         button.textContent = enable ? DISABLE : ENABLE;
         g_isEnabled = enable;
     }
