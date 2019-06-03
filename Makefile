@@ -10,6 +10,7 @@ common_files := \
 	options/* \
 	content_scripts/* \
 	browser_action/* \
+	LICENSE \
 	libvoikko.data
 firefox_files := \
 	data/*.svg \
