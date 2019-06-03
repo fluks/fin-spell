@@ -10,17 +10,12 @@
         }
     },
 
-    "content_scripts": [
-        {
-            "matches": [ "*://*/*" ],
-            "js": [
-                "content_scripts/jquery-3.3.1.min.js",
-                "content_scripts/jquery.highlight-within-textarea.js",
-                "content_scripts/content_script.js"
-            ],
-            "css": [ "content_scripts/jquery.highlight-within-textarea.css" ]
-        }
-    ],
+    "icons": {
+        "16": "data/flag_16x16.svg",
+        "48": "data/flag_48x48.svg",
+        "96": "data/flag_96x96.svg",
+        "128": "data/flag_128x128.svg"
+    },
 
     "background": {
         "scripts": [
@@ -29,9 +24,27 @@
         ]
     },
 
+    "browser_action": {
+        "browser_style": true,
+        "default_popup": "browser_action/browser_action.html",
+        "default_title": "Fin Spell",
+        "default_icon": {
+            "16": "data/flag_16x16.svg",
+            "48": "data/flag_48x48.svg",
+            "96": "data/flag_96x96.svg",
+            "128": "data/flag_128x128.svg"
+        }
+    },
+
+    "options_ui": {
+        "page": "options/options.html",
+        "open_in_tab": true
+    },
+
     "permissions": [
         "storage",
         "<all_urls>",
-        "contextMenus"
+        "contextMenus",
+        "activeTab"
     ]
 }

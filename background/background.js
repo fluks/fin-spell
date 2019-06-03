@@ -66,15 +66,48 @@ const handleClick = (info, tab, word, sendResponse) => {
 };
 
 /**
+ * @function injectScripts
+ * @param tabId {Integer}
+ * @throws If tabs.insertCSS or tabs.executeScript fails.
+ */
+const injectScripts = async (tabId) => {
+    await browser.tabs.insertCSS(tabId, {
+        allFrames: true,
+        file: 'content_scripts/jquery.highlight-within-textarea.css',
+    });
+    const opts = await browser.storage.sync.get([ 'spellHighlight', 'spellHighlightBackup' ]);
+    [
+        { code: opts.spellHighlight.code, class: opts.spellHighlight.class },
+        { code: opts.spellHighlightBackup.code, class: opts.spellHighlightBackup.class },
+    ].filter(sp => sp.code)
+    .forEach(async (sp) => {
+        const code = `.hwt-content mark.${sp.class} { ${sp.code} }`;
+        await browser.tabs.insertCSS(tabId, {
+            allFrames: true,
+            code: code,
+        });
+    });
+    [
+        '/content_scripts/jquery_highlight_combined.js',
+        '/content_scripts/content_script.js',
+    ].forEach(async (s) => {
+        await browser.tabs.executeScript(tabId, {
+            allFrames: true,
+            file: s,
+        });
+    });
+};
+
+/**
  * @function listener
  * @param request {Object}
- * @param sender {}
+ * @param sender {runtime.MessageSender}
  * @param sendResponse {Function}
  * @param voikko {Voikko}
  * @returns {Bool|undefined}
  */
 const listener = (request, sender, sendResponse, voikko) => {
-    let response = { data: { index: request.data.index, } };
+    let response = { data: {} };
     if (request.name === 'spell') {
         response.name = 'spell';
         response.data.tokens = spell(voikko, request.data.text);
@@ -100,6 +133,17 @@ const listener = (request, sender, sendResponse, voikko) => {
         chrome.contextMenus.refresh();
         return true;
     }
+    else if (request.name === 'inject_scripts') {
+        try {
+            injectScripts(request.tabId);
+            response.injected = true;
+            sendResponse(response);
+            return true;
+        }
+        catch (error) {
+            response = { error: error };
+        }
+    }
     else
         response = { error: 'Invalid name' };
 
@@ -113,9 +157,40 @@ const listener = (request, sender, sendResponse, voikko) => {
 const load = (libvoikko) => {
     const voikko = libvoikko.init('fi');
     
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) =>
+    browser.runtime.onMessage.addListener((request, sender, sendResponse) =>
         listener(request, sender, sendResponse, voikko));
 };
+
+/**
+ * @function setDefaultOptions
+ * @param details {Object}
+ */
+const setDefaultOptions = (details) => {
+    if (details.reason === 'install') {
+        const highlightedElements = [
+            'input[type=search]',
+            'input[type=text]',
+            'textarea',
+        ];
+        const options = {
+            spellSelectors: highlightedElements.join(','),
+            spellHighlight: {
+                code: '',
+                class: 'user-highlight',
+            },
+            spellHighlightBackup: {
+                code: '',
+                class: 'user-highlight-backup',
+            },
+        };
+        // XXX Shallow copy.
+        options.defaults = Object.assign({}, options);
+
+        chrome.storage.sync.set(options);
+    }
+};
+
+chrome.runtime.onInstalled.addListener(setDefaultOptions);
 
 Libvoikko({
     onLoad: load,

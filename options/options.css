@@ -1,0 +1,31 @@
+* {
+  margin: 5px;
+}
+
+label {
+  margin: auto 5px;
+}
+
+textarea {
+  width: 300px;
+  height: 80px;
+}
+
+.center {
+  text-align: center;
+}
+
+.accesskey {
+  margin: auto;
+  text-decoration: underline;
+}
+
+#button-div {
+  margin-top: 15px;
+}
+
+#grid {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  width: 100%;
+}

@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Fin Spell -asetukset</title>
+    <link rel="stylesheet" type="text/css" href="options.css">
+  </head>
+  <body>
+    <div id="grid">
+      <label for="spell-selectors" data-i18n="">Oikoluettavat elementit</label>
+      <textarea id="spell-selectors" title="Käytä CSS-valitsimia, yksi riville."></textarea>
+      <label for="spell-highlight" data-i18n="">Oikoluvun korostaminen</label>
+      <textarea id="spell-highlight"></textarea>
+      <label for="spell-highlight-backup" data-i18n="">Oikoluvun korostaminen varalle</label>
+      <textarea id="spell-highlight-backup"></textarea>
+    </div>
+    <div id="button-div" class="center">
+      <button id="reset-to-defaults" accesskey="P">
+        <span class="accesskey">P</span>alauta oletusasetukset
+      </button>
+    </div>
+    <script src="options.js"></script>
+  </body>
+</html>

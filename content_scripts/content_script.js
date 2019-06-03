@@ -2,6 +2,8 @@
 
 'use strict';
 
+const HIGHLIGHT_INPUT_CLASSNAME = 'hwt-input';
+
 /**
  * @function isWordChar
  * @param c {String}
@@ -63,11 +65,12 @@ const findWord = (elem) => {
 };
 
 /**
- * @function highligth
+ * @function highlight
  * @async
  * @param ev {Event}
+ * @param cursorIndex {Integer|null}
  */
-const highligth = async (ev) => {
+const highlight = async (ev, cursorIndex = null) => {
     const res = await chrome.runtime.sendMessage({
         name: 'spell',
         data: { text: ev.target.value, },
@@ -80,8 +83,17 @@ const highligth = async (ev) => {
             highlights.push([ index, index + len]);
         index += len;
     });
-    $(ev.target).highlightWithinTextarea({ highlight: highlights });
+    const options = await browser.storage.sync.get([ 'spellHighlight', 'spellHighlightBackup' ]);
+    // TODO Get background and decide whether to use backup.
+    const args = { highlight: highlights, };
+    if (options.spellHighlight.code)
+        args.className = options.spellHighlight.class;
+    $(ev.target).highlightWithinTextarea(args);
     ev.target.focus();
+    if (cursorIndex !== null) {
+        ev.target.selectionStart = cursorIndex;
+        ev.target.selectionEnd = cursorIndex;
+    }
 };
 
 /**
@@ -94,6 +106,8 @@ const highligth = async (ev) => {
  * @param ev {Event}
  */
 const suggestWords = async (ev) => {
+    const cursorIndex = ev.target.selectionStart;
+
     const [ word, first, last ] = findWord(ev.target);
     if (!word)
         return;
@@ -109,13 +123,68 @@ const suggestWords = async (ev) => {
         ev.target.value.slice(last + 1);
     ev.target.value = s;
 
-    highligth(ev);
+    highlight(ev, cursorIndex);
 };
 
-document.querySelectorAll('input[type=search],input[type=text],textarea')
-    .forEach(elem => {
-        // Works but not inputs and can change the element's UI.
-        elem.addEventListener('keyup', highligth);
-        elem.addEventListener('contextmenu', suggestWords);
+/**
+ * @function addHighlighterToNewNodes
+ * @param mutations {MutationRecord[]}
+ * @param observer {MutationObserver}
+ * @param options {Object}
+ */
+const addHighlighterToNewNodes = (mutations, observer, options) => {
+    mutations.forEach(m => {
+        Array.from(m.addedNodes).forEach(n => {
+            if (n.matches(options.spellSelectors)) {
+                n.addEventListener('input', highlight);
+                n.addEventListener('contextmenu', suggestWords);
+            }
+        });
+    });
+};
+
+let g_enabled = false,
+    g_options = null;
+(async () => {
+    g_options = await chrome.storage.sync.get(null);
+})();
+const g_observer = new MutationObserver((mutations, observer) =>
+    addHighlighterToNewNodes(mutations, observer, g_options));
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    let response = {};
+
+    if (request.name === 'is_enabled') {
+        response = { enabled: g_enabled, };
     }
-);
+    else if (request.name === 'enable_highlight') {
+        const elems = document.querySelectorAll(g_options.spellSelectors);
+
+        if (request.enable) {
+            elems.forEach(e => {
+                e.addEventListener('input', highlight);
+                e.addEventListener('contextmenu', suggestWords);
+            });
+
+            g_observer.observe(document.body, { childList: true, subtree: true });
+
+            response = { enabled_highlight: true, };
+            g_enabled = true;
+        }
+        else {
+            elems.forEach(e => {
+                if (e.classList.contains(HIGHLIGHT_INPUT_CLASSNAME))
+                    $(e).highlightWithinTextarea('destroy');
+                e.removeEventListener('input', highlight);
+                e.removeEventListener('contextmenu', suggestWords);
+            });
+
+            g_observer.disconnect();
+
+            response = { enabled_highlight: false, };
+            g_enabled = false;
+        }
+    }
+
+    sendResponse(response);
+    return true;
+});
