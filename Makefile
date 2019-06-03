@@ -1,19 +1,22 @@
 js := \
 	background/*.js \
 	options/*.js \
-	content_scripts/*.js
+	content_scripts/*.js \
+	browser_action/*.js
 #locale_files := $(shell find _locales -type f)
 common_files := \
 	manifest.json \
 	background/* \
-	options/*
+	options/* \
+	content_scripts/* \
+	browser_action/* \
+	libvoikko.data
 firefox_files := \
+	data/*.svg \
 	$(common_files)
 chromium_files := \
 	$(common_files)
 
-# My node version is old, this adds Array.includes support.
-node :=
 # Needed if you want to pass options for node.
 web-ext := web-ext
 firefox-bin := ~/Downloads/firefox_dev/firefox
@@ -28,17 +31,19 @@ run:
 	$(node) $(web-ext) \
 		-f $(firefox-bin) \
 		--pref intl.locale.requested=fi \
+		--pref layout.spellcheckDefault=0 \
 		-u about:debugging \
-		--verbose \
 		-u about:addons \
+		-u https://css-tricks.com/examples/TextareaTricks/ \
+		--verbose \
 		-p $(ff-profile) \
 		run
 
 firefox: change_to_firefox
-	zip -r redirect_link-$(version_suffix).xpi $(firefox_files)
+	zip -r fin_spell-$(version_suffix).xpi $(firefox_files)
 
 chromium: change_to_chromium
-	zip redirect_link-$(version_suffix).zip $(chromium_files)
+	zip fin_spell-$(version_suffix).zip $(chromium_files)
 
 change_to_firefox:
 	cp firefox/manifest.json .
