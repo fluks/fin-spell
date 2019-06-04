@@ -8,7 +8,8 @@ common_files := \
 	manifest.json \
 	background/* \
 	options/* \
-	content_scripts/* \
+	content_scripts/content_script.js \
+	content_scripts/jquery_highlight_combined.js \
 	browser_action/* \
 	LICENSE \
 	libvoikko.data
