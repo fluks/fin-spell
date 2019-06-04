@@ -83,8 +83,7 @@ const highlight = async (ev, cursorIndex = null) => {
             highlights.push([ index, index + len]);
         index += len;
     });
-    const options = await browser.storage.sync.get([ 'spellHighlight', 'spellHighlightBackup' ]);
-    // TODO Get background and decide whether to use backup.
+    const options = await browser.storage.sync.get([ 'spellHighlight' ]);
     const args = { highlight: highlights, };
     if (options.spellHighlight.code)
         args.className = options.spellHighlight.class;

@@ -75,10 +75,9 @@ const injectScripts = async (tabId) => {
         allFrames: true,
         file: 'content_scripts/jquery.highlight-within-textarea.css',
     });
-    const opts = await browser.storage.sync.get([ 'spellHighlight', 'spellHighlightBackup' ]);
+    const opts = await browser.storage.sync.get([ 'spellHighlight' ]);
     [
         { code: opts.spellHighlight.code, class: opts.spellHighlight.class },
-        { code: opts.spellHighlightBackup.code, class: opts.spellHighlightBackup.class },
     ].filter(sp => sp.code)
     .forEach(async (sp) => {
         const code = `.hwt-content mark.${sp.class} { ${sp.code} }`;
@@ -177,10 +176,6 @@ const setDefaultOptions = (details) => {
             spellHighlight: {
                 code: '',
                 class: 'user-highlight',
-            },
-            spellHighlightBackup: {
-                code: '',
-                class: 'user-highlight-backup',
             },
         };
         // XXX Shallow copy.

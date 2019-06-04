@@ -4,7 +4,6 @@
 
 const g_spellSelectorsTextarea = document.querySelector('#spell-selectors'),
     g_spellHighlightInput = document.querySelector('#spell-highlight'),
-    g_spellHighlightBackupInput = document.querySelector('#spell-highlight-backup'),
     g_resetToDefaultsButton = document.querySelector('#reset-to-defaults'),
     g_spellHighlightClasses = {};
 
@@ -15,10 +14,8 @@ const g_spellSelectorsTextarea = document.querySelector('#spell-selectors'),
 const loadOptions = (options) => {
     g_spellSelectorsTextarea.value = options.spellSelectors.replace(/,/g, '\n');
     g_spellHighlightInput.value = options.spellHighlight.code;
-    g_spellHighlightBackupInput.value = options.spellHighlightBackup.code;
 
     g_spellHighlightClasses.spellHighlight = options.spellHighlight.class;
-    g_spellHighlightClasses.spellHighlightBackup = options.spellHighlightBackup.class;
 };
 
 /**
@@ -31,10 +28,6 @@ const saveOptions = (ev) => {
         spellHighlight: {
             code: g_spellHighlightInput.value,
             class: g_spellHighlightClasses.spellHighlight,
-        },
-        spellHighlightBackup: {
-            code: g_spellHighlightBackupInput.value,
-            class: g_spellHighlightClasses.spellHighlightBackup,
         },
     };
 
