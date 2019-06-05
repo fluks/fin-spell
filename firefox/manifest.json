@@ -6,7 +6,8 @@
 
     "applications": {
         "gecko": {
-            "id": "finspell@fluks"
+            "id": "finspell@fluks",
+            "update_url": "https://github.com/fluks/fin-spell/raw/master/updates.json"
         }
     },
 

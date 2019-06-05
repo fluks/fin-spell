@@ -1,0 +1,12 @@
+{
+  "addons": {
+    "finspell@fluks": {
+      "updates": [
+        {
+          "version": "0.1.0",
+          "update_link": "https://github.com/fluks/fin-spell/archive/fin_spell-0.1.0.xpi"
+        }
+      ]
+    }
+  }
+}
