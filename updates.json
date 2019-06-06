@@ -4,7 +4,7 @@
       "updates": [
         {
           "version": "0.1.0",
-          "update_link": "https://github.com/fluks/fin-spell/archive/fin_spell-0.1.0.xpi"
+          "update_link": "https://github.com/fluks/fin-spell/releases/download/v0.1.0/fin_spell-0_1_0.xpi"
         }
       ]
     }
