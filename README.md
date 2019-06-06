@@ -64,3 +64,7 @@ https://github.com/lonekorean/highlight-within-textarea/raw/master/jquery.highli
 ## License
 
 GPL3.
+
+## Download
+
+[v0.1.0](https://github.com/fluks/fin-spell/releases/download/v0.1.0/fin_spell-0.1.0-fx.xpi)
