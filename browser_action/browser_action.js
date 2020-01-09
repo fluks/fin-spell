@@ -55,7 +55,6 @@ const enableHighlightButtonHandler = async (ev) => {
             currentWindow: true,
         });
         if (g_isEnabled === null) {
-            console.log('injecting scripts');
             let res = await browser.runtime.sendMessage({
                 name: 'inject_scripts',
                 tabId: tabs[0].id,
