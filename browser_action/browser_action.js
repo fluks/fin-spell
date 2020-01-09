@@ -23,9 +23,8 @@ const setup = async (ev) => {
         g_enableButton.textContent = r.enabled ? DISABLE : ENABLE;
         g_isEnabled = r.enabled;
     }
-    // Content scripts not injected.
+    // Content scripts not injected, there's no one listening.
     catch (error) {
-        console.log('scripts not injected');
         g_enableButton.textContent = ENABLE;
     }
 };
@@ -42,10 +41,6 @@ const enableHighlight = async (tabId, enable, button) => {
         name: 'enable_highlight',
         enable: enable,
     });
-    if (res.hasOwnProperty('enabled_highlight')) {
-        button.textContent = enable ? DISABLE : ENABLE;
-        g_isEnabled = enable;
-    }
 };
 
 /*
@@ -65,8 +60,6 @@ const enableHighlightButtonHandler = async (ev) => {
                 name: 'inject_scripts',
                 tabId: tabs[0].id,
             });
-            g_enableButton.textContent = DISABLE;
-            g_isEnabled = true;
         }
         else if (!g_isEnabled)
             enableHighlight(tabs[0].id, true, ev.target);
@@ -76,6 +69,8 @@ const enableHighlightButtonHandler = async (ev) => {
     catch (error) {
         console.log(error);
     }
+
+    window.close();
 };
 
 document.addEventListener('DOMContentLoaded', setup);

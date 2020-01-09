@@ -57,21 +57,17 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
     let response = {};
 
     if (request.name === 'is_enabled') {
-        response = { enabled: g_enabled, };
+        sendResponse({ enabled: g_enabled, });
+        return true;
     }
     else if (request.name === 'enable_highlight') {
         if (request.enable) {
             enableHighlight(true);
             g_enabled = true;
-            response = { enabled_highlight: true, };
         }
         else {
             enableHighlight(false);
             g_enabled = false;
-            response = { enabled_highlight: false, };
         }
     }
-
-    sendResponse(response);
-    return true;
 });
