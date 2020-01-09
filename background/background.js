@@ -88,6 +88,7 @@ const injectScripts = async (tabId) => {
     });
     [
         '/content_scripts/jquery_highlight_combined.js',
+        '/common/spell.js',
         '/content_scripts/content_script.js',
     ].forEach(async (s) => {
         await browser.tabs.executeScript(tabId, {
