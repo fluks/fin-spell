@@ -65,12 +65,8 @@ const enableHighlightButtonHandler = async (ev) => {
                 name: 'inject_scripts',
                 tabId: tabs[0].id,
             });
-            // TODO Returns before scripts are ready to use. Either send message
-            // from a script that it's ready or set a timer if browser action
-            // shares scope with content scripts.
-            if (res.injected) {
-                setTimeout(() => enableHighlight(tabs[0].id, true, ev.target), 100);
-            }
+            g_enableButton.textContent = DISABLE;
+            g_isEnabled = true;
         }
         else if (!g_isEnabled)
             enableHighlight(tabs[0].id, true, ev.target);

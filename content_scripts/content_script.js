@@ -3,6 +3,8 @@
 'use strict';
 
 const HIGHLIGHT_INPUT_CLASSNAME = 'hwt-input';
+let g_enabled = false;
+
 
 /**
  * @function addHighlighterToNewNodes
@@ -21,42 +23,52 @@ const addHighlighterToNewNodes = async (mutations, observer) => {
     });
 };
 
-let g_enabled = false;
 const g_observer = new MutationObserver((mutations, observer) =>
     addHighlighterToNewNodes(mutations, observer));
-browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+
+const enableHighlight = async (enable) => {
+    const options = await browser.storage.sync.get(null);
+    const elems = document.querySelectorAll(options.spellSelectors);
+
+    if (enable) {
+        elems.forEach(e => {
+            e.addEventListener('input', spell.highlight);
+            e.addEventListener('contextmenu', spell.suggestWords);
+        });
+
+        g_observer.observe(document.body, { childList: true, subtree: true });
+    }
+    else {
+        elems.forEach(e => {
+            if (e.classList.contains(HIGHLIGHT_INPUT_CLASSNAME))
+                $(e).highlightWithinTextarea('destroy');
+            e.removeEventListener('input', spell.highlight);
+            e.removeEventListener('contextmenu', spell.suggestWords);
+        });
+
+        g_observer.disconnect();
+    }
+};
+
+enableHighlight(true);
+g_enabled = true;
+
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
     let response = {};
 
     if (request.name === 'is_enabled') {
         response = { enabled: g_enabled, };
     }
     else if (request.name === 'enable_highlight') {
-        const options = await browser.storage.sync.get(null);
-        const elems = document.querySelectorAll(options.spellSelectors);
-
         if (request.enable) {
-            elems.forEach(e => {
-                e.addEventListener('input', spell.highlight);
-                e.addEventListener('contextmenu', spell.suggestWords);
-            });
-
-            g_observer.observe(document.body, { childList: true, subtree: true });
-
-            response = { enabled_highlight: true, };
+            enableHighlight(true);
             g_enabled = true;
+            response = { enabled_highlight: true, };
         }
         else {
-            elems.forEach(e => {
-                if (e.classList.contains(HIGHLIGHT_INPUT_CLASSNAME))
-                    $(e).highlightWithinTextarea('destroy');
-                e.removeEventListener('input', spell.highlight);
-                e.removeEventListener('contextmenu', spell.suggestWords);
-            });
-
-            g_observer.disconnect();
-
-            response = { enabled_highlight: false, };
+            enableHighlight(false);
             g_enabled = false;
+            response = { enabled_highlight: false, };
         }
     }
 
