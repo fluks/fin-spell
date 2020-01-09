@@ -166,13 +166,14 @@ const load = (libvoikko) => {
  * @param details {Object}
  */
 const setDefaultOptions = (details) => {
+    let options = {};
     if (details.reason === 'install') {
         const highlightedElements = [
             'input[type=search]',
             'input[type=text]',
             'textarea',
         ];
-        const options = {
+        options = {
             spellSelectors: highlightedElements.join(','),
             spellHighlight: {
                 code: '',
@@ -182,11 +183,28 @@ const setDefaultOptions = (details) => {
         // XXX Shallow copy.
         options.defaults = Object.assign({}, options);
 
-        chrome.storage.sync.set(options);
+        // XXX New options here, add to update too.
+        options.sidebar_textarea_rows = 30;
+        options.sidebar_textarea_cols = 50;
+        // End of new options.
     }
+    else if (details.reason === 'update') {
+        options = {};
+        // Add same new options as in the install.
+        chrome.storage.sync.get(null, (o) => {
+            if (!o.hasOwnProperty('sidebar_textarea_rows'))
+                options['sidebar_textarea_rows'] = 30;
+            if (!o.hasOwnProperty('sidebar_textarea_cols'))
+                options['sidebar_textarea_rows'] = 50;
+        });
+    }
+    chrome.storage.sync.set(options);
 };
 
 chrome.runtime.onInstalled.addListener(setDefaultOptions);
+chrome.commands.onCommand.addListener(() => {
+    browser.sidebarAction.open();
+});
 
 Libvoikko({
     onLoad: load,

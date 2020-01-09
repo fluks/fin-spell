@@ -1,0 +1,15 @@
+.buttons {
+  text-align: center;
+  margin-top: 5px;
+}
+
+.accesskey {
+  text-decoration: underline;
+}
+
+#textarea {
+}
+
+.container {
+  margin: 3px 0 0 3px;
+}

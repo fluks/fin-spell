@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="../content_scripts/jquery.highlight-within-textarea.css" rel="stylesheet" type="text/css" />
+    <link href="sidebar.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div class="container">
+      <div>
+        <textarea class="hwt-content hwt-input" id="textarea" spellcheck="false"></textarea>
+      </div>
+      <div class="buttons">
+        <button id="copy-all"><span class="accesskey" accesskey="k">K</span>opioi kaikki</button>
+      </div>
+    </div>
+    <script src="../content_scripts/jquery_highlight_combined.js"></script>
+    <script src="../common/spell.js"></script>
+    <script src="sidebar.js"></script>
+  </body>
+</html>
