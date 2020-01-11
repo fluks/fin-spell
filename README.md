@@ -39,7 +39,7 @@ wget https://www.puimula.org/htp/testing/voikko-snapshot-v5/dict-morpho.zip
 unzip dict-morpho.zip
 rm dict-morpho.zip
 
-# Needs automake, autocong and pkg-config packages.
+# Needs automake, autoconf and pkg-config packages.
 # Install libtool if you get error: possibly undefined macro: AC_LIBTOOL_WIN32_DLL.
 # You might need to install libtinfo5 and openjdk-X-jdk also.
 ./autogen.sh
@@ -67,4 +67,5 @@ GPL3.
 
 ## Download
 
+[v0.2.0](https://github.com/fluks/fin-spell/releases/download/v0.2.0/fin_spell-0.2.0-fx.xpi)
 [v0.1.0](https://github.com/fluks/fin-spell/releases/download/v0.1.0/fin_spell-0.1.0-fx.xpi)
