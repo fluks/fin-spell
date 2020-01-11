@@ -17,11 +17,18 @@ const copyAllToClipboard = () => {
 
 };
 
-const onLoad = (e) => {
+const onLoad = async (e) => {
     chrome.storage.sync.get(null, (o) => {
         g_textarea.rows = o.sidebar_textarea_rows;
         g_textarea.cols = o.sidebar_textarea_cols;
-    })
+    });
+    const opts = await browser.storage.sync.get([ 'spellHighlight' ]);
+    const code = opts.spellHighlight.code;
+    if (code) {
+        const style = document.createElement('style');
+        style.innerHTML = `.hwt-content mark.${opts.spellHighlight.class} { ${code} }`;
+        document.body.appendChild(style);
+    }
 };
 
 g_textarea.addEventListener('input', spell.highlight);
