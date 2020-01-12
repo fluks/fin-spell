@@ -5,6 +5,18 @@
 const HIGHLIGHT_INPUT_CLASSNAME = 'hwt-input';
 let g_enabled = false;
 
+/**
+ * Add event listeners and disable native spellcheck for spell checked
+ * elements.
+ * @function modifyForSpelling
+ * @param elem {HTMLElement}
+ */
+const modifyForSpelling = (elem) => {
+    elem.addEventListener('input', spell.highlight);
+    elem.addEventListener('contextmenu', spell.suggestWords);
+    elem.setAttribute('spellcheck', 'false');
+};
+
 
 /**
  * @function addHighlighterToNewNodes
@@ -16,8 +28,7 @@ const addHighlighterToNewNodes = async (mutations, observer) => {
     mutations.forEach(m => {
         Array.from(m.addedNodes).forEach(n => {
             if (n.matches(options.spellSelectors)) {
-                n.addEventListener('input', spell.highlight);
-                n.addEventListener('contextmenu', spell.suggestWords);
+                modifyForSpelling(n);
             }
         });
     });
@@ -31,10 +42,7 @@ const enableHighlight = async (enable) => {
     const elems = document.querySelectorAll(options.spellSelectors);
 
     if (enable) {
-        elems.forEach(e => {
-            e.addEventListener('input', spell.highlight);
-            e.addEventListener('contextmenu', spell.suggestWords);
-        });
+        elems.forEach(e => modifyForSpelling(e));
 
         g_observer.observe(document.body, { childList: true, subtree: true });
     }
@@ -44,6 +52,7 @@ const enableHighlight = async (enable) => {
                 $(e).highlightWithinTextarea('destroy');
             e.removeEventListener('input', spell.highlight);
             e.removeEventListener('contextmenu', spell.suggestWords);
+            e.setAttribute('spellcheck', 'true');
         });
 
         g_observer.disconnect();
