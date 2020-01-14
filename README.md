@@ -56,10 +56,10 @@ highlight-within-textarea JavaScript files.
 
 https://code.jquery.com/jquery-3.3.1.min.js
 
-https://github.com/lonekorean/highlight-within-textarea/raw/master/jquery.highlight-within-textarea.js
+https://github.com/Dalimil/highlight-within-textarea/raw/master/jquery.highlight-within-textarea.js
 
 content_scripts/jquery.highlight-within-textarea.css's source is
-https://github.com/lonekorean/highlight-within-textarea/raw/master/jquery.highlight-within-textarea.css.
+https://github.com/Dalimil/highlight-within-textarea/raw/master/jquery.highlight-within-textarea.css
 
 ## License
 
@@ -68,4 +68,5 @@ GPL3.
 ## Download
 
 [v0.2.0](https://github.com/fluks/fin-spell/releases/download/v0.2.0/fin_spell-0.2.0-fx.xpi)
+
 [v0.1.0](https://github.com/fluks/fin-spell/releases/download/v0.1.0/fin_spell-0.1.0-fx.xpi)

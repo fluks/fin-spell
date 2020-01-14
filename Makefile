@@ -22,8 +22,6 @@ firefox_files := \
 chromium_files := \
 	$(common_files)
 
-# Needed if you want to pass options for node.
-web-ext := web-ext
 firefox-bin := ~/Downloads/firefox_dev/firefox
 ff-profile := dev-edition-default
 
@@ -33,11 +31,12 @@ version_suffix := $(shell grep -o '[0-9]\.[0-9]\.[0-9]' manifest.json | head -1 
 	doc supported_versions compare_install_and_source
 
 run:
-	$(node) $(web-ext) \
+	web-ext \
 		-f $(firefox-bin) \
 		--pref intl.locale.requested=fi \
 		--pref layout.spellcheckDefault=0 \
-		-u about:debugging \
+		-u 'about:debugging#/runtime/this-firefox' \
+		-u 'about:devtools-toolbox?type=extension&id=finspell%40fluks' \
 		-u about:addons \
 		-u https://css-tricks.com/examples/TextareaTricks/ \
 		--verbose \
@@ -60,7 +59,7 @@ change_to_chromium:
 lint: change_to_firefox
 	# Check JSON syntax.
 	$(foreach file,$(locale_files),json_xs -f json < $(file) 1>/dev/null;)
-	$(node) $(web-ext) lint --ignore-files doc/* --ignore-files background/libvoikko.js
+	web-ext lint --ignore-files doc/* --ignore-files background/libvoikko.js
 	eslint $(js)
 
 supported_versions:
