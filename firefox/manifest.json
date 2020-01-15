@@ -1,13 +1,14 @@
 {
     "manifest_version": 2,
     "name": "Fin Spell",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "author": "fluks",
 
     "applications": {
         "gecko": {
             "id": "finspell@fluks",
-            "update_url": "https://github.com/fluks/fin-spell/raw/master/updates.json"
+            "update_url": "https://github.com/fluks/fin-spell/raw/master/updates.json",
+            "strict_min_version": "62"
         }
     },
 

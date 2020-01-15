@@ -7,6 +7,7 @@ const g_spellSelectorsTextarea = document.querySelector('#spell-selectors'),
     g_resetToDefaultsButton = document.querySelector('#reset-to-defaults'),
     g_sidebarTextareaRows = document.querySelector('#sidebar-textarea-rows'),
     g_sidebarTextareaCols = document.querySelector('#sidebar-textarea-cols'),
+    g_dictionary = document.querySelector('#dictionary'),
     g_spellHighlightClasses = {};
 
 /**
@@ -21,6 +22,8 @@ const loadOptions = (options) => {
 
     g_sidebarTextareaRows.value = options['sidebar_textarea_rows'];
     g_sidebarTextareaCols.value = options['sidebar_textarea_cols'];
+
+    g_dictionary.value = Object.keys(options['dictionary']).sort().join('\n');
 };
 
 /**
@@ -38,11 +41,18 @@ const saveOptions = (ev) => {
         sidebar_textarea_cols: parseInt(g_sidebarTextareaCols.value),
     };
 
-    chrome.storage.sync.set(options);
+    const words = {};
+    g_dictionary.value.split('\n').forEach(w => {
+        if (w)
+            words[w] = true;
+    });
+    options['dictionary'] = words;
+
+    chrome.storage.local.set(options);
 };
 
-chrome.storage.sync.get(null, loadOptions);
+chrome.storage.local.get(null, loadOptions);
 document.addEventListener('blur', saveOptions);
 g_resetToDefaultsButton.addEventListener('click',
-    () => chrome.storage.sync.get([ 'defaults' ],
+    () => chrome.storage.local.get([ 'defaults' ],
         (options) => loadOptions(options.defaults)));

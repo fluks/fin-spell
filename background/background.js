@@ -3,6 +3,8 @@
 'use strict';
 
 const ROOTMENU_ID = 'rootmenu';
+// Words user has added.
+let g_dictionary = {};
 
 /**
  * @function spell
@@ -12,10 +14,18 @@ const ROOTMENU_ID = 'rootmenu';
  */
 const spell = (voikko, text) => {
     return voikko.tokens(text).map(t => {
-        if (t.type === 'WORD')
-            return { token: t.text, correct: voikko.spell(t.text) };
-        else
-            return { token: t.text, correct: undefined };
+        if (t.type === 'WORD') {
+            return {
+                token: t.text,
+                correct: voikko.spell(t.text) || !!g_dictionary[t.text],
+            };
+        }
+        else {
+            return {
+                token: t.text,
+                correct: undefined,
+            };
+        }
     });
 };
 
@@ -53,14 +63,26 @@ const removeMenus = () => {
 };
 
 /**
- * @function handleClick
- * @param info {}
- * @param tab {tabs.Tab}
+ * @function replaceWordWithSuggestion
  * @param word {String}
  * @param sendResponse {Function}
  */
-const handleClick = (info, tab, word, sendResponse) => {
+const replaceWordWithSuggestion = (word, sendResponse) => {
     removeMenus();
+
+    sendResponse({ name: 'replace_word', data: { word: word, } });
+};
+
+/**
+ * @function addWordToDictionary
+ * @param word {String} A word to be added to dictionary.
+ * @param sendResponse {Function}
+ */
+const addWordToDictionary = (word, sendResponse) => {
+    removeMenus();
+
+    g_dictionary[word] = true;
+    chrome.storage.local.set({ 'dictionary': g_dictionary, });
 
     sendResponse({ name: 'replace_word', data: { word: word, } });
 };
@@ -75,7 +97,7 @@ const injectScripts = async (tabId) => {
         allFrames: true,
         file: 'content_scripts/jquery.highlight-within-textarea.css',
     });
-    const opts = await browser.storage.sync.get([ 'spellHighlight' ]);
+    const opts = await browser.storage.local.get([ 'spellHighlight' ]);
     [
         { code: opts.spellHighlight.code, class: opts.spellHighlight.class },
     ].filter(sp => sp.code)
@@ -99,6 +121,20 @@ const injectScripts = async (tabId) => {
 };
 
 /**
+ * @function createAddWordToDictionaryMenuItem
+ * @param word {String} Word possible added to dictionary.
+ * @param sendResponse {Function}
+ */
+const createAddWordToDictionaryMenuItem = (word, sendResponse) => {
+    chrome.contextMenus.create({
+        id: 'add-word-to-dictionary',
+        title: 'Lisää omaan sanastoon',
+        onclick: () => addWordToDictionary(word, sendResponse),
+        parentId: ROOTMENU_ID,
+    });
+};
+
+/**
  * @function listener
  * @param request {Object}
  * @param sender {runtime.MessageSender}
@@ -113,8 +149,22 @@ const listener = (request, sender, sendResponse, voikko) => {
         response.data.tokens = spell(voikko, request.data.text);
     }
     else if (request.name === 'suggest') {
+        if (g_dictionary[request.data.word]) {
+            sendResponse({ name: 'replace_word', data: { word: null, } });
+            return true;
+        }
         const words = suggest(voikko, request.data.word);
-        if (words.length <= 1) {
+        const correct = spell(voikko, request.data.word);
+        if (words.length <= 1 && !correct[0].correct) {
+            createRootmenu();
+            createAddWordToDictionaryMenuItem(request.data.word, sendResponse);
+            chrome.contextMenus.onHidden.addListener(removeMenus);
+            chrome.contextMenus.refresh();
+
+            return true;
+        }
+        // 1 = word is correct, don't do anything.
+        else if (words.length === 1) {
             sendResponse({ name: 'replace_word', data: { word: null, } });
             return true;
         }
@@ -125,10 +175,17 @@ const listener = (request, sender, sendResponse, voikko) => {
                 id: i.toString(),
                 title: w,
                 parentId: ROOTMENU_ID,
-                onclick: (info, tab) =>
-                    handleClick(info, tab, w, sendResponse),
+                onclick: () => replaceWordWithSuggestion(w, sendResponse),
             });
         });
+
+        chrome.contextMenus.create({
+            id: 'separator1',
+            type: 'separator',
+            parentId: ROOTMENU_ID,
+        });
+        createAddWordToDictionaryMenuItem(request.data.word, sendResponse);
+
         chrome.contextMenus.onHidden.addListener(removeMenus);
         chrome.contextMenus.refresh();
         return true;
@@ -148,6 +205,7 @@ const listener = (request, sender, sendResponse, voikko) => {
         response = { error: 'Invalid name' };
 
     sendResponse(response);
+    return true;
 };
 
 /**
@@ -172,6 +230,8 @@ const setDefaultOptions = (details) => {
             'input[type=search]',
             'input[type=text]',
             'textarea',
+            '*[spellcheck=true]',
+            '*[contenteditable=true]',
         ];
         options = {
             spellSelectors: highlightedElements.join(','),
@@ -180,30 +240,51 @@ const setDefaultOptions = (details) => {
                 class: 'user-highlight',
             },
         };
-        // XXX Shallow copy.
-        options.defaults = Object.assign({}, options);
 
         // XXX New options here, add to update too.
         options.sidebar_textarea_rows = 30;
         options.sidebar_textarea_cols = 50;
+        options.dictionary = {};
         // End of new options.
+
+        // XXX Shallow copy.
+        options.defaults = Object.assign({}, options);
     }
     else if (details.reason === 'update') {
         options = {};
         // Add same new options as in the install.
-        chrome.storage.sync.get(null, (o) => {
+        chrome.storage.local.get(null, (o) => {
             if (!o.hasOwnProperty('sidebar_textarea_rows'))
                 options['sidebar_textarea_rows'] = 30;
             if (!o.hasOwnProperty('sidebar_textarea_cols'))
                 options['sidebar_textarea_rows'] = 50;
+            if (!o.hasOwnProperty('dictionary'))
+                options['dictionary'] = {};
         });
     }
-    chrome.storage.sync.set(options);
+    chrome.storage.local.set(options);
+};
+
+/** Update dictionary if it changed.
+ * @function updateDictionary
+ * @param changes {Object}
+ * @param area {String}
+ */
+const updateDictionary = (changes, area) => {
+    if (area !== 'local')
+        return;
+
+    if (changes.hasOwnProperty('dictionary'))
+        g_dictionary = changes['dictionary'].newValue;
 };
 
 chrome.runtime.onInstalled.addListener(setDefaultOptions);
 chrome.commands.onCommand.addListener(() => {
     browser.sidebarAction.open();
+});
+chrome.storage.onChanged.addListener(updateDictionary);
+chrome.storage.local.get(['dictionary'], o => {
+    g_dictionary = o.dictionary;
 });
 
 Libvoikko({

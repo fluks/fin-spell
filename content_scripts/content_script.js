@@ -24,7 +24,7 @@ const modifyForSpelling = (elem) => {
  * @param observer {MutationObserver}
  */
 const addHighlighterToNewNodes = async (mutations, observer) => {
-    const options = await browser.storage.sync.get(null);
+    const options = await browser.storage.local.get(null);
     mutations.forEach(m => {
         Array.from(m.addedNodes).forEach(n => {
             if (n.matches(options.spellSelectors)) {
@@ -38,7 +38,7 @@ const g_observer = new MutationObserver((mutations, observer) =>
     addHighlighterToNewNodes(mutations, observer));
 
 const enableHighlight = async (enable) => {
-    const options = await browser.storage.sync.get(null);
+    const options = await browser.storage.local.get(null);
     const elems = document.querySelectorAll(options.spellSelectors);
 
     if (enable) {

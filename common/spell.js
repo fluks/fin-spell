@@ -82,7 +82,7 @@ const spell = {
                 highlights.push([ index, index + len]);
             index += len;
         });
-        const options = await browser.storage.sync.get([ 'spellHighlight' ]);
+        const options = await browser.storage.local.get([ 'spellHighlight' ]);
         const args = { highlight: highlights, };
         if (options.spellHighlight.code)
             args.className = options.spellHighlight.class;
