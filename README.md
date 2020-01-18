@@ -10,8 +10,10 @@ This add-on is based on libvoikko, like the old Mozvoikko.
 
 ## Limitations
 
-Users can't add new words, the add-on must be upgraded to use a new
-dictionary.
+* Many elements that function like a textarea doesn't work at all or the highlighting is off.
+* Users can't add new words to be used with libvoikko, the add-on must be upgraded to use a new
+dictionary, but users can now add words to be used as wordlist.
+* Writing fast or a longer piece of text can start lagging.
 
 ## Compiling libvoikko
 
