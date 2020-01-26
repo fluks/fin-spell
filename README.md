@@ -25,8 +25,8 @@ terminal.
 git clone https://github.com/juj/emsdk.git
 cd emsdk
 ./emsdk update-tags
-./emsdk install sdk-1.38.30-64bit
-./emsdk activate sdk-1.38.30-64bit
+./emsdk install sdk-fastcomp-1.38.30-64bit
+./emsdk activate sdk-fastcomp-1.38.30-64bit
 source ./emsdk_env.sh
 cd ..
 
@@ -36,7 +36,7 @@ cd corevoikko/libvoikko
 git checkout rel-libvoikko-4.3
 
 # Get the dictionary.
-# sha256sum: eb3730ec8c3ff8be444479540ce33566d98cc19ecdda1077427556d4e48ad431
+# sha256sum: 136e8142dd34ddf181919decb742897a4f055e7fa12d4dcc8b5c9cb6660488da
 wget https://www.puimula.org/htp/testing/voikko-snapshot-v5/dict-morpho.zip
 unzip dict-morpho.zip
 rm dict-morpho.zip
@@ -46,7 +46,7 @@ rm dict-morpho.zip
 # You might need to install libtinfo5 and openjdk-X-jdk also.
 ./autogen.sh
 js/configure.sh
-js/build.sh preload
+sh js/build.sh preload
 # libvoikko.data, libvoikko_api.js, libvoikko.js and libvoikko.wasm which
 # are used in this add-on are in js/.
 ```
