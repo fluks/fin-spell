@@ -30,10 +30,10 @@ cd emsdk
 source ./emsdk_env.sh
 cd ..
 
-# Libvoikko. I used version rel-libvoikko-4.2
+# Libvoikko. I used version rel-libvoikko-4.3
 git clone https://github.com/voikko/corevoikko
 cd corevoikko/libvoikko
-git checkout rel-libvoikko-4.2 
+git checkout rel-libvoikko-4.3
 
 # Get the dictionary.
 # sha256sum: eb3730ec8c3ff8be444479540ce33566d98cc19ecdda1077427556d4e48ad431
