@@ -13,6 +13,10 @@
         {
           "version": "0.3.0",
           "update_link": "https://github.com/fluks/fin-spell/releases/download/v0.3.0/fin_spell-0.3.0-fx.xpi"
+        },
+        {
+          "version": "0.4.0",
+          "update_link": "https://github.com/fluks/fin-spell/releases/download/v0.4.0/fin_spell-0.4.0-fx.xpi"
         }
       ]
     }
