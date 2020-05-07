@@ -4,8 +4,9 @@ js := \
 	content_scripts/*.js \
 	browser_action/*.js \
 	common/*.js \
-	sidebar/*.js
-#locale_files := $(shell find _locales -type f)
+	sidebar/*.js \
+	l10n/*.js
+locale_files := $(shell find _locales -type f)
 common_files := \
 	manifest.json \
 	background/* \
@@ -15,7 +16,9 @@ common_files := \
 	LICENSE \
 	libvoikko.data \
 	common/* \
-	sidebar/*
+	sidebar/* \
+	l10n/* \
+	$(locale_files)
 firefox_files := \
 	data/*.svg \
 	$(common_files)

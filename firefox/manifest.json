@@ -12,6 +12,8 @@
         }
     },
 
+    "default_locale": "fi",
+
     "icons": {
         "16": "data/flag_16x16.svg",
         "48": "data/flag_48x48.svg",

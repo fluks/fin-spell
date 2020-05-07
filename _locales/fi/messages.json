@@ -1,0 +1,8 @@
+{
+    "browserAction_On": {
+        "message": "Päälle"
+    },
+    "browserAction_Off": {
+        "message": "Pois"
+    }
+}

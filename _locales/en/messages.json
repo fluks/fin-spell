@@ -1,0 +1,8 @@
+{
+    "browserAction_On": {
+        "message": "On"
+    },
+    "browserAction_Off": {
+        "message": "Off"
+    }
+}

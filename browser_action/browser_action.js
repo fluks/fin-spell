@@ -2,8 +2,10 @@
 
 'use strict';
 
-const ENABLE = 'Päälle',
-    DISABLE = 'Pois',
+const _ = browser.i18n.getMessage;
+
+const ENABLE = _('browserAction_On'),
+    DISABLE = _('browserAction_Off'),
     g_enableButton = document.querySelector('#enable-highlight-button');
 let g_isEnabled = null;
 

@@ -2,27 +2,29 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Fin Spell -asetukset</title>
+    <title data-l10n-id="title">Fin Spell -asetukset</title>
     <link rel="stylesheet" type="text/css" href="options.css">
+    <script type="text/javascript" src="../l10n/l10n.js"></script>
+    <link rel="prefetch" type="application/l10n" href="../l10n/options.ini" />
   </head>
   <body>
     <div id="grid">
-      <label for="spell-selectors" data-i18n="">Oikoluettavat elementit</label>
-      <textarea id="spell-selectors" title="Käytä CSS-valitsimia, yksi riville."></textarea>
-      <label for="spell-highlight" data-i18n="">Oikoluvun korostus</label>
-      <textarea id="spell-highlight" title="Esimerkki:
+      <label for="spell-selectors" data-l10n-id="spellcheckedElements">Oikoluettavat elementit</label>
+      <textarea id="spell-selectors" data-l10n-id="spellSelectorsTitle" title="Käytä CSS-valitsimia, yksi riville."></textarea>
+      <label for="spell-highlight" data-l10n-id="spellcheckingHighlight">Oikoluvun korostus</label>
+      <textarea id="spell-highlight" data-l10n-id="spellcheckingTitle" title="Esimerkki:
   text-decoration: underline wavy red;
   background-color: transparent;"></textarea>
-      <label for="sidebar-textarea-rows" data-18n="">Sivupaneelin rivit</label>
+      <label for="sidebar-textarea-rows" data-l10n-id="sidebarRows">Sivupaneelin rivit</label>
       <input type="number" min="1" id="sidebar-textarea-rows">
-      <label for="sidebar-textarea-cols" data-18n="">Sivupaneelin sarakkeet</label>
+      <label for="sidebar-textarea-cols" data-l10n-id="sidebarColumns">Sivupaneelin sarakkeet</label>
       <input type="number" min="1" id="sidebar-textarea-cols">
-      <label for="dictionary" data-18n="">Oma sanasto</label>
-      <textarea rows="10" cols="20" id="dictionary" placeholder="Yksi sana riville"></textarea>
+      <label for="dictionary" data-l10n-id="yourDictionary">Oma sanasto</label>
+      <textarea rows="10" cols="20" id="dictionary" data-l10n-id="yourDictionaryPlaceholder" placeholder="Yksi sana riville"></textarea>
     </div>
     </div>
     <div id="button-div" class="center">
-      <button id="reset-to-defaults" accesskey="P">
+      <button id="reset-to-defaults" accesskey="P" data-l10n-id="resetDefaults">
         <span class="accesskey">P</span>alauta oletusasetukset
       </button>
     </div>
