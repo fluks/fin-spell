@@ -22,16 +22,13 @@ common_files := \
 firefox_files := \
 	data/*.svg \
 	$(common_files)
-chromium_files := \
-	$(common_files)
 
 firefox-bin := ~/Downloads/firefox_dev/firefox
 ff-profile := dev-edition-default
 
 version_suffix := $(shell grep -o '[0-9]\.[0-9]\.[0-9]' manifest.json | head -1 | sed 's/\./_/g')
 
-.PHONY: run firefox chromium clean change_to_firefox change_to_chromium lint \
-	doc supported_versions compare_install_and_source
+.PHONY: run firefox clean change_to_firefox lint doc supported_versions compare_install_and_source
 
 run:
 	web-ext \
@@ -49,14 +46,8 @@ run:
 firefox: change_to_firefox
 	zip -r fin_spell-$(version_suffix).xpi $(firefox_files)
 
-chromium: change_to_chromium
-	zip fin_spell-$(version_suffix).zip $(chromium_files)
-
 change_to_firefox:
 	cp firefox/manifest.json .
-
-change_to_chromium:
-	cp chromium/manifest.json .
 
 # web-ext lint finds errors if manifest.json isn't the Firefox version.
 lint: change_to_firefox
