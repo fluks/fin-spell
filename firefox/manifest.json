@@ -7,7 +7,6 @@
     "applications": {
         "gecko": {
             "id": "finspell@fluks",
-            "update_url": "https://github.com/fluks/fin-spell/raw/master/updates.json",
             "strict_min_version": "62.0"
         }
     },
