@@ -69,8 +69,4 @@ GPL3.
 
 ## Download
 
-[v0.3.0](https://github.com/fluks/fin-spell/releases/download/v0.3.0/fin_spell-0.3.0-fx.xpi)
-
-[v0.2.0](https://github.com/fluks/fin-spell/releases/download/v0.2.0/fin_spell-0.2.0-fx.xpi)
-
-[v0.1.0](https://github.com/fluks/fin-spell/releases/download/v0.1.0/fin_spell-0.1.0-fx.xpi)
+[AMO](https://addons.mozilla.org/en-US/firefox/addon/fin-spell/)
