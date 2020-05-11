@@ -139,7 +139,6 @@
 			this.$el
 				.addClass(ID + '-input ' + ID + '-content')
 				.css(textareaCssFix)
-				.on('input.' + ID, this.handleInput.bind(this))
 				.on('scroll.' + ID, this.handleScroll.bind(this));
 
 			this.$highlights = $('<div>', { class: ID + '-highlights ' + ID + '-content' })
@@ -155,37 +154,13 @@
 				.append(this.$backdrop, this.$el) // moves $el into $container
 				.on('scroll', this.blockContainerScroll.bind(this));
 
-			this.browser = this.detectBrowser();
-			switch (this.browser) {
-				case 'firefox':
-					this.fixFirefox();
-					break;
-				case 'ios':
-					this.fixIOS();
-					break;
-			}
+			this.fixFirefox();
 
 			// plugin function checks this for success
 			this.isGenerated = true;
 
 			// trigger input event to highlight any existing input
 			this.handleInput();
-		},
-
-		// browser sniffing sucks, but there are browser-specific quirks to handle
-		// that are not a matter of feature detection
-		detectBrowser: function() {
-			let ua = window.navigator.userAgent.toLowerCase();
-			if (ua.indexOf('firefox') !== -1) {
-				return 'firefox';
-			} else if (!!ua.match(/msie|trident\/7|edge/)) {
-				return 'ie';
-			} else if (!!ua.match(/ipad|iphone|ipod/) && ua.indexOf('windows phone') === -1) {
-				// Windows Phone flags itself as "like iPhone", thus the extra check
-				return 'ios';
-			} else {
-				return 'other';
-			}
 		},
 
 		// Firefox doesn't show text that scrolls into the padding of a textarea, so
@@ -220,96 +195,23 @@
 				});
 		},
 
-		// iOS adds 3px of (unremovable) padding to the left and right of a textarea,
-		// so adjust highlights div to match
-		fixIOS: function() {
-			this.$highlights.css({
-				'padding-left': '+=3px',
-				'padding-right': '+=3px'
-			});
-		},
-
 		handleInput: function() {
 			let input = this.$el.val();
-			let ranges = this.getRanges(input, this.highlight);
+			const ranges = this.getRanges(this.highlight);
 			let unstaggeredRanges = this.removeStaggeredRanges(ranges);
 			let boundaries = this.getBoundaries(unstaggeredRanges);
 			this.renderMarks(boundaries);
 		},
 
-		getRanges: function(input, highlight) {
-			let type = this.getType(highlight);
-			switch (type) {
-				case 'array':
-					return this.getArrayRanges(input, highlight);
-				case 'function':
-					return this.getFunctionRanges(input, highlight);
-				case 'regexp':
-					return this.getRegExpRanges(input, highlight);
-				case 'string':
-					return this.getStringRanges(input, highlight);
-				case 'range':
-					return this.getRangeRanges(input, highlight);
-				case 'custom':
-					return this.getCustomRanges(input, highlight);
-				default:
-					if (!highlight) {
-						// do nothing for falsey values
-						return [];
-					} else {
-						console.error('unrecognized highlight type');
-					}
-			}
-		},
-
-		getArrayRanges: function(input, arr) {
-			let ranges = arr.map(this.getRanges.bind(this, input));
-			return Array.prototype.concat.apply([], ranges);
-		},
-
-		getFunctionRanges: function(input, func) {
-			return this.getRanges(input, func(input));
-		},
-
-		getRegExpRanges: function(input, regex) {
-			let ranges = [];
-			let match;
-			while (match = regex.exec(input), match !== null) {
-				ranges.push([match.index, match.index + match[0].length]);
-				if (!regex.global) {
-					// non-global regexes do not increase lastIndex, causing an infinite loop,
-					// but we can just break manually after the first match
-					break;
-				}
-			}
-			return ranges;
-		},
-
-		getStringRanges: function(input, str) {
-			let ranges = [];
-			let inputLower = input.toLowerCase();
-			let strLower = str.toLowerCase();
-			let index = 0;
-			while (index = inputLower.indexOf(strLower, index), index !== -1) {
-				ranges.push([index, index + strLower.length]);
-				index += strLower.length;
-			}
-			return ranges;
-		},
-
-		getRangeRanges: function(input, range) {
-			return [range];
-		},
-
-		getCustomRanges: function(input, custom) {
-			let ranges = this.getRanges(input, custom.highlight);
-			if (custom.className) {
+		getRanges: function(highlight) {
+			const ranges = highlight.highlight;
+			if (highlight.className) {
 				ranges.forEach(function(range) {
 					// persist class name as a property of the array
 					if (range.className) {
-						range.className = custom.className + ' ' + range.className;
+						range.className = highlight.className + ' ' + range.className;
 					} else {
-						range.className = custom.className;
+						range.className = highlight.className;
 					}
 				});
 			}
