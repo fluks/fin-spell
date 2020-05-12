@@ -39,6 +39,7 @@ run:
 		-u 'about:devtools-toolbox?type=extension&id=finspell%40fluks' \
 		-u about:addons \
 		-u https://css-tricks.com/examples/TextareaTricks/ \
+		-u https://html.com/attributes/textarea-name/ \
 		--verbose \
 		-p $(ff-profile) \
 		run
