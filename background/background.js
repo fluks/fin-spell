@@ -2,7 +2,8 @@
 
 'use strict';
 
-const ROOTMENU_ID = 'rootmenu';
+const ROOTMENU_ID = 'rootmenu',
+    _ = browser.i18n.getMessage;
 // Words user has added.
 let g_dictionary = {};
 
@@ -128,7 +129,7 @@ const injectScripts = async (tabId) => {
 const createAddWordToDictionaryMenuItem = (word, sendResponse) => {
     chrome.contextMenus.create({
         id: 'add-word-to-dictionary',
-        title: 'Lisää omaan sanastoon',
+        title: _('background_addToDictionary'),
         onclick: () => addWordToDictionary(word, sendResponse),
         parentId: ROOTMENU_ID,
     });

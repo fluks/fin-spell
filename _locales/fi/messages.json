@@ -4,5 +4,8 @@
     },
     "browserAction_Off": {
         "message": "Pois"
+    },
+    "background_addToDictionary": {
+        "message": "Lisää omaan sanastoon"
     }
 }

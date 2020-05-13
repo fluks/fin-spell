@@ -4,5 +4,8 @@
     },
     "browserAction_Off": {
         "message": "Off"
+    },
+    "background_addToDictionary": {
+        "message": "Add to Dictionary"
     }
 }
