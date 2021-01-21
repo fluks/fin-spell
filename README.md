@@ -63,6 +63,15 @@ https://github.com/Dalimil/highlight-within-textarea/raw/master/jquery.highlight
 content_scripts/jquery.highlight-within-textarea.css's source is
 https://github.com/Dalimil/highlight-within-textarea/raw/master/jquery.highlight-within-textarea.css
 
+## Building
+
+* See Compiling libvoikko first.
+* `make change_to_firefox`
+* Install web-ext so that web-ext executable is in the PATH.
+* Change `firefox-bin` variable in Makefile to point to a Firefox binary you want to use.
+* Change `ff-profile` variable in Makefile to an existing Firefox profile you want to use.
+* `make run`
+
 ## License
 
 GPL3.
