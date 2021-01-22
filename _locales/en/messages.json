@@ -1,9 +1,9 @@
 {
     "browserAction_On": {
-        "message": "On"
+        "message": "Always On"
     },
     "browserAction_Off": {
-        "message": "Off"
+        "message": "Always Off"
     },
     "background_addToDictionary": {
         "message": "Add to Dictionary"

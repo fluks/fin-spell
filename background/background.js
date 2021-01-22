@@ -5,7 +5,8 @@
 const ROOTMENU_ID = 'rootmenu',
     _ = browser.i18n.getMessage;
 // Words user has added.
-let g_dictionary = {};
+let g_dictionary = {},
+    g_scripts;
 
 /**
  * @function spell
@@ -89,39 +90,6 @@ const addWordToDictionary = (word, sendResponse) => {
 };
 
 /**
- * @function injectScripts
- * @param tabId {Integer}
- * @throws If tabs.insertCSS or tabs.executeScript fails.
- */
-const injectScripts = async (tabId) => {
-    await browser.tabs.insertCSS(tabId, {
-        allFrames: true,
-        file: 'content_scripts/jquery.highlight-within-textarea.css',
-    });
-    const opts = await browser.storage.local.get([ 'spellHighlight' ]);
-    [
-        { code: opts.spellHighlight.code, class: opts.spellHighlight.class },
-    ].filter(sp => sp.code)
-    .forEach(async (sp) => {
-        const code = `.hwt-content mark.${sp.class} { ${sp.code} }`;
-        await browser.tabs.insertCSS(tabId, {
-            allFrames: true,
-            code: code,
-        });
-    });
-    [
-        '/content_scripts/jquery_highlight_combined.js',
-        '/common/spell.js',
-        '/content_scripts/content_script.js',
-    ].forEach(async (s) => {
-        await browser.tabs.executeScript(tabId, {
-            allFrames: true,
-            file: s,
-        });
-    });
-};
-
-/**
  * @function createAddWordToDictionaryMenuItem
  * @param word {String} Word possible added to dictionary.
  * @param sendResponse {Function}
@@ -191,17 +159,6 @@ const listener = (request, sender, sendResponse, voikko) => {
         chrome.contextMenus.refresh();
         return true;
     }
-    else if (request.name === 'inject_scripts') {
-        try {
-            injectScripts(request.tabId);
-            response.injected = true;
-            sendResponse(response);
-            return true;
-        }
-        catch (error) {
-            response = { error: error };
-        }
-    }
     else
         response = { error: 'Invalid name' };
 
@@ -246,6 +203,11 @@ const setDefaultOptions = (details) => {
         options.sidebar_textarea_rows = 30;
         options.sidebar_textarea_cols = 50;
         options.dictionary = {};
+        options.onOff = {
+            enabled: false,
+            whitelist: [],
+            blacklist: [],
+        };
         // End of new options.
 
         // XXX Shallow copy.
@@ -261,29 +223,72 @@ const setDefaultOptions = (details) => {
                 options['sidebar_textarea_rows'] = 50;
             if (!o.hasOwnProperty('dictionary'))
                 options['dictionary'] = {};
+            if (!o.hasOwnProperty['onOff']) {
+                options['onOff'] = {
+                    enabled: false,
+                    whitelist: [],
+                    blacklist: [],
+                };
+            }
+
         });
     }
     chrome.storage.local.set(options);
 };
 
 /** Update dictionary if it changed.
- * @function updateDictionary
+ * @function onOptionsChange
  * @param changes {Object}
  * @param area {String}
  */
-const updateDictionary = (changes, area) => {
+const onOptionsChange = async (changes, area) => {
     if (area !== 'local')
         return;
 
     if (changes.hasOwnProperty('dictionary'))
         g_dictionary = changes['dictionary'].newValue;
+
+    if (changes.hasOwnProperty('onOff')) {
+        const cs = {
+            allFrames: true,
+            css: [
+                { file: '/content_scripts/jquery.highlight-within-textarea.css' },
+            ],
+            js: [
+                { file: '/content_scripts/jquery_highlight_combined.js' },
+                { file: '/common/spell.js' },
+                { file: '/content_scripts/content_script.js' },
+            ],
+            runAt: 'document_idle',
+        };
+
+        const opts = await browser.storage.local.get([ 'spellHighlight', 'onOff' ]);
+        if (opts.onOff.enabled) {
+            cs.matches = [ '<all_urls>' ];
+            cs.excludeGlobs = opts.onOff.blacklist;
+        }
+        else {
+            cs.matches = opts.onOff.whitelist;
+        }
+
+        [
+            { code: opts.spellHighlight.code, class: opts.spellHighlight.class },
+        ].filter(sp => sp.code)
+        .forEach(sp => {
+            cs.css.push({ code: `.hwt-content mark.${sp.class} { ${sp.code} }` });
+        });
+
+        if (g_scripts)
+            g_scripts.unregister();
+        g_scripts = await browser.contentScripts.register(cs);
+    }
 };
 
 chrome.runtime.onInstalled.addListener(setDefaultOptions);
 chrome.commands.onCommand.addListener(() => {
     browser.sidebarAction.open();
 });
-chrome.storage.onChanged.addListener(updateDictionary);
+chrome.storage.onChanged.addListener(onOptionsChange);
 chrome.storage.local.get(['dictionary'], o => {
     g_dictionary = o.dictionary;
 });

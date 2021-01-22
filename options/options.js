@@ -8,6 +8,10 @@ const g_spellSelectorsTextarea = document.querySelector('#spell-selectors'),
     g_sidebarTextareaRows = document.querySelector('#sidebar-textarea-rows'),
     g_sidebarTextareaCols = document.querySelector('#sidebar-textarea-cols'),
     g_dictionary = document.querySelector('#dictionary'),
+    g_enabled = document.querySelector('#enabled'),
+    g_disabled = document.querySelector('#disabled'),
+    g_whitelist = document.querySelector('#whitelist'),
+    g_blacklist = document.querySelector('#blacklist'),
     g_spellHighlightClasses = {};
 
 /**
@@ -24,6 +28,13 @@ const loadOptions = (options) => {
     g_sidebarTextareaCols.value = options['sidebar_textarea_cols'];
 
     g_dictionary.value = Object.keys(options['dictionary']).sort().join('\n');
+
+    g_whitelist.value = options.onOff.whitelist.join('\n');
+    g_blacklist.value = options.onOff.blacklist.join('\n');
+    if (options.onOff.enabled)
+        g_enabled.checked = true;
+    else
+        g_disabled.checked = true;
 };
 
 /**
@@ -47,6 +58,12 @@ const saveOptions = (ev) => {
             words[w] = true;
     });
     options['dictionary'] = words;
+
+    options.onOff = {
+        enabled: g_enabled.checked,
+        whitelist: g_whitelist.value.split('\n'),
+        blacklist: g_blacklist.value.split('\n'),
+    };
 
     chrome.storage.local.set(options);
 };

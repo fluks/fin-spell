@@ -21,6 +21,14 @@
       <input type="number" min="1" id="sidebar-textarea-cols">
       <label for="dictionary" data-l10n-id="yourDictionary">Oma sanasto</label>
       <textarea rows="10" cols="20" id="dictionary" data-l10n-id="yourDictionaryPlaceholder" placeholder="Yksi sana riville"></textarea>
+      <label for="disabled" data-l10n-id="alwaysDisabled">Aina pois päältä</label>
+      <input type="radio" id="disabled" name="onOff" value="disabled">
+      <label for="whitelist" data-l10n-id="whitelist">Poikkeukset</label>
+      <textarea id="whitelist" placeholder="https://example.*/*"></textarea>
+      <label for="enabled" data-l10n-id="alwaysEnabled">Aina päällä</label>
+      <input type="radio" id="enabled" name="onOff" value="enabled">
+      <label for="blacklist" data-l10n-id="blacklist">Poikkeukset</label>
+      <textarea id="blacklist" placeholder="*example.*"></textarea>
     </div>
     </div>
     <div id="button-div" class="center">

@@ -1,9 +1,9 @@
 {
     "browserAction_On": {
-        "message": "Päälle"
+        "message": "Aina päällä"
     },
     "browserAction_Off": {
-        "message": "Pois"
+        "message": "Aina pois päältä"
     },
     "background_addToDictionary": {
         "message": "Lisää omaan sanastoon"
