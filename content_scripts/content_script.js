@@ -3,6 +3,7 @@
 'use strict';
 
 const HIGHLIGHT_INPUT_CLASSNAME = 'hwt-input';
+let g_enabled = true;
 
 /**
  * Add event listeners and disable native spellcheck for spell checked
@@ -59,3 +60,18 @@ const enableHighlight = async (enable) => {
 };
 
 enableHighlight(true);
+
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.off) {
+        enableHighlight(false);
+        g_enabled = false;
+    }
+    else if (request.on) {
+        enableHighlight(true);
+        g_enabled = true;
+    }
+    else if (request.enabled) {
+        sendResponse({ enabled: g_enabled });
+    }
+    return true;
+});

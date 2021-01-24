@@ -103,6 +103,38 @@ const createAddWordToDictionaryMenuItem = (word, sendResponse) => {
     });
 };
 
+/** Inject temporary scripts.
+ * @function injectScripts
+ * @param tabId {Integer}
+ */
+const injectScripts = async (tabId) => {
+    await browser.tabs.insertCSS(tabId, {
+        allFrames: true,
+        file: 'content_scripts/jquery.highlight-within-textarea.css',
+    });
+    const opts = await browser.storage.local.get([ 'spellHighlight' ]);
+    [
+        { code: opts.spellHighlight.code, class: opts.spellHighlight.class },
+    ].filter(sp => sp.code)
+    .forEach(async (sp) => {
+        const code = `.hwt-content mark.${sp.class} { ${sp.code} }`;
+        await browser.tabs.insertCSS(tabId, {
+            allFrames: true,
+            code: code,
+        });
+    });
+    [
+        '/content_scripts/jquery_highlight_combined.js',
+        '/common/spell.js',
+        '/content_scripts/content_script.js',
+    ].forEach(async (s) => {
+        await browser.tabs.executeScript(tabId, {
+            allFrames: true,
+            file: s,
+        });
+    });
+};
+
 /**
  * @function listener
  * @param request {Object}
@@ -157,6 +189,10 @@ const listener = (request, sender, sendResponse, voikko) => {
 
         chrome.contextMenus.onHidden.addListener(removeMenus);
         chrome.contextMenus.refresh();
+        return true;
+    }
+    else if (request.name === 'inject_scripts') {
+        injectScripts(request.tabId);
         return true;
     }
     else
@@ -269,6 +305,9 @@ const onOptionsChange = async (changes, area) => {
         }
         else {
             cs.matches = opts.onOff.whitelist;
+            // matches can't be empty.
+            if (cs.matches.length === 0)
+                cs.matches = [ 'wss://this.doesnt.exist.blaa/', ];
         }
 
         [
