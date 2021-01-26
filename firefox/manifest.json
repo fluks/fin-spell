@@ -69,6 +69,7 @@
         "storage",
         "<all_urls>",
         "contextMenus",
-        "activeTab"
+        "activeTab",
+        "menus"
     ]
 }

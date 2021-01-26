@@ -41,6 +41,32 @@ const suggest = (voikko, word) => {
     return voikko.suggest(word);
 };
 
+/*
+ * @function setSpellcheckingTemporarilyOnOrOff
+ * @param info {Object} Information about the item clicked and the context where the click happened.
+ * @param tab {tabs.Tab} The details of the tab where the click took place.
+ * @async
+ */
+const setSpellcheckingTemporarilyOnOrOff = async (info, tab) => {
+    let enabled, inject = false;
+    try {
+        const res = await browser.tabs.sendMessage(tab.id, { enabled: true, });
+        enabled = res.enabled;
+    }
+    // Content scripts not injected, there's no one listening.
+    catch (error) {
+        enabled = false;
+        inject = true;
+    }
+
+    if (enabled)
+        browser.tabs.sendMessage(tab.id, { off: true, });
+    else if (inject)
+        injectScripts(tab.id);
+    else
+        browser.tabs.sendMessage(tab.id, { on: true, });
+};
+
 /**
  * @function createRootmenu
  */
@@ -48,8 +74,20 @@ const createRootmenu = () => {
     chrome.contextMenus.create({
         id: ROOTMENU_ID,
         title: 'Fin Spell',
-        contexts: [ "editable", ],
+        contexts: [ 'all', ],
         visible: true,
+    });
+    chrome.contextMenus.create({
+        id: 'onOff',
+        contexts: [ 'all', ],
+        parentId: ROOTMENU_ID,
+        onclick: setSpellcheckingTemporarilyOnOrOff,
+    });
+    chrome.contextMenus.create({
+        id: 'separator0',
+        type: 'separator',
+        contexts: [ 'editable', ],
+        parentId: ROOTMENU_ID,
     });
 };
 
@@ -58,6 +96,7 @@ const createRootmenu = () => {
  */
 const removeMenus = () => {
     chrome.contextMenus.removeAll();
+    createRootmenu();
     chrome.contextMenus.refresh();
     if (chrome.contextMenus.onHidden.hasListener(removeMenus)) {
         chrome.contextMenus.onHidden.removeListener(removeMenus);
@@ -157,7 +196,6 @@ const listener = (request, sender, sendResponse, voikko) => {
         const words = suggest(voikko, request.data.word);
         const correct = spell(voikko, request.data.word);
         if (words.length <= 1 && !correct[0].correct) {
-            createRootmenu();
             createAddWordToDictionaryMenuItem(request.data.word, sendResponse);
             chrome.contextMenus.onHidden.addListener(removeMenus);
             chrome.contextMenus.refresh();
@@ -170,7 +208,6 @@ const listener = (request, sender, sendResponse, voikko) => {
             return true;
         }
 
-        createRootmenu();
         words.forEach((w, i) => {
             chrome.contextMenus.create({
                 id: i.toString(),
@@ -202,6 +239,26 @@ const listener = (request, sender, sendResponse, voikko) => {
     return true;
 };
 
+/* Set on/off title of the context menu of enabling or disabling the spell checking temporarily.
+ * @function setOnOffTitle
+ * @param info {Object} Information about the item clicked and the context where the click happened.
+ * @param tab {tabs.Tab} The details of the tab where the click took place.
+ * @async
+ */
+const setOnOffTitle = async (info, tab) => {
+    let enabled;
+    try {
+        const res = await browser.tabs.sendMessage(tab.id, { enabled: true, });
+        enabled = res.enabled;
+    }
+    // Content scripts not injected, there's no one listening.
+    catch (error) {
+        enabled = false;
+    }
+    browser.menus.update('onOff', { title: enabled ? _('browserAction_Off') : _('browserAction_On') });
+    browser.menus.refresh();
+};
+
 /**
  * @function load
  * @param libvoikko {Libvoikko}
@@ -211,6 +268,9 @@ const load = (libvoikko) => {
     
     browser.runtime.onMessage.addListener((request, sender, sendResponse) =>
         listener(request, sender, sendResponse, voikko));
+
+    browser.menus.onShown.addListener(setOnOffTitle);
+    createRootmenu();
 };
 
 /**
