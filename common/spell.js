@@ -78,7 +78,7 @@ const spell = {
         let index = 0;
         res.data.tokens.forEach(t => {
             const len = t.token.length;
-            if (t.correct === false)
+            if (t.correct === false && (ev.target.selectionStart < index || ev.target.selectionStart > index + len))
                 highlights.push([ index, index + len]);
             index += len;
         });
