@@ -5,6 +5,14 @@
 const HIGHLIGHT_INPUT_CLASSNAME = 'hwt-input';
 let g_enabled = true;
 
+/* Without the delay the target element doesn't yet contain the pasted text.
+ * @function delayedSpellHighlight
+ * @param {ClipboardEvent}
+ */
+const delayedSpellHighlight = (e) => {
+    window.setTimeout(() => spell.highlight(e), 100);
+};
+
 /**
  * Add event listeners and disable native spellcheck for spell checked
  * elements.
@@ -12,7 +20,9 @@ let g_enabled = true;
  * @param elem {HTMLElement}
  */
 const modifyForSpelling = (elem) => {
-    elem.addEventListener('input', spell.highlight);
+    elem.addEventListener('keyup', spell.highlight);
+    elem.addEventListener('click', spell.highlight);
+    elem.addEventListener('paste', delayedSpellHighlight);
     elem.addEventListener('contextmenu', spell.suggestWords);
     elem.setAttribute('spellcheck', 'false');
 };
@@ -50,7 +60,9 @@ const enableHighlight = async (enable) => {
         elems.forEach(e => {
             if (e.classList.contains(HIGHLIGHT_INPUT_CLASSNAME))
                 $(e).highlightWithinTextarea('destroy');
-            e.removeEventListener('input', spell.highlight);
+            e.removeEventListener('keyup', spell.highlight);
+            e.removeEventListener('click', spell.highlight);
+            e.removeEventListener('paste', delayedSpellHighlight);
             e.removeEventListener('contextmenu', spell.suggestWords);
             e.setAttribute('spellcheck', 'true');
         });
