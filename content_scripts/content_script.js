@@ -52,7 +52,11 @@ const enableHighlight = async (enable) => {
     const elems = document.querySelectorAll(options.spellSelectors);
 
     if (enable) {
-        elems.forEach(e => modifyForSpelling(e));
+        elems.forEach(e => {
+            modifyForSpelling(e);
+            // Object doesn't need to be an Event, only target atttribute is used.
+            spell.highlight({ target: e });
+        });
 
         g_observer.observe(document.body, { childList: true, subtree: true });
     }
