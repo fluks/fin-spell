@@ -52,11 +52,21 @@ const enableHighlight = async (enable) => {
     const elems = document.querySelectorAll(options.spellSelectors);
 
     if (enable) {
-        elems.forEach(e => {
+        const oldActiveElement = document.activeElement;
+        const x = window.pageXOffset;
+        const y = window.pageYOffset;
+
+        elems.forEach(async e => {
             modifyForSpelling(e);
             // Object doesn't need to be an Event, only target atttribute is used.
             spell.highlight({ target: e });
         });
+
+        // TODO Can this be achieved without a timeout? await'ng spell.highlight doesn't help.
+        window.setTimeout(() => {
+            oldActiveElement.focus();
+            window.scrollTo(x, y);
+        }, 100);
 
         g_observer.observe(document.body, { childList: true, subtree: true });
     }
