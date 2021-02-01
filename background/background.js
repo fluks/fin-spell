@@ -68,26 +68,13 @@ const setSpellcheckingTemporarilyOnOrOff = async (info, tab) => {
 };
 
 /**
- * @function createRootmenu
+ * @function createOnOffMenu
  */
-const createRootmenu = () => {
-    chrome.contextMenus.create({
-        id: ROOTMENU_ID,
-        title: 'Fin Spell',
-        contexts: [ 'all', ],
-        visible: true,
-    });
+const createOnOffMenu = () => {
     chrome.contextMenus.create({
         id: 'onOff',
         contexts: [ 'all', ],
-        parentId: ROOTMENU_ID,
         onclick: setSpellcheckingTemporarilyOnOrOff,
-    });
-    chrome.contextMenus.create({
-        id: 'separator0',
-        type: 'separator',
-        contexts: [ 'editable', ],
-        parentId: ROOTMENU_ID,
     });
 };
 
@@ -96,7 +83,7 @@ const createRootmenu = () => {
  */
 const removeMenus = () => {
     chrome.contextMenus.removeAll();
-    createRootmenu();
+    createOnOffMenu();
     chrome.contextMenus.refresh();
     if (chrome.contextMenus.onHidden.hasListener(removeMenus)) {
         chrome.contextMenus.onHidden.removeListener(removeMenus);
@@ -134,12 +121,32 @@ const addWordToDictionary = (word, sendResponse) => {
  * @param sendResponse {Function}
  */
 const createAddWordToDictionaryMenuItem = (word, sendResponse) => {
+    chrome.contextMenus.removeAll();
+
+    chrome.contextMenus.create({
+        id: ROOTMENU_ID,
+        title: 'Fin Spell',
+        contexts: [ 'editable' ],
+    });
+    chrome.contextMenus.create({
+        id: 'onOff',
+        contexts: [ 'all', ],
+        parentId: ROOTMENU_ID,
+        onclick: setSpellcheckingTemporarilyOnOrOff,
+    });
+    chrome.contextMenus.create({
+        id: 'separator2',
+        type: 'separator',
+        parentId: ROOTMENU_ID,
+    });
     chrome.contextMenus.create({
         id: 'add-word-to-dictionary',
         title: _('background_addToDictionary'),
         onclick: () => addWordToDictionary(word, sendResponse),
         parentId: ROOTMENU_ID,
     });
+
+    chrome.contextMenus.refresh();
 };
 
 /** Inject temporary scripts.
@@ -198,7 +205,6 @@ const listener = (request, sender, sendResponse, voikko) => {
         if (words.length <= 1 && !correct[0].correct) {
             createAddWordToDictionaryMenuItem(request.data.word, sendResponse);
             chrome.contextMenus.onHidden.addListener(removeMenus);
-            chrome.contextMenus.refresh();
 
             return true;
         }
@@ -208,6 +214,13 @@ const listener = (request, sender, sendResponse, voikko) => {
             return true;
         }
 
+        createAddWordToDictionaryMenuItem(request.data.word, sendResponse);
+        chrome.contextMenus.create({
+            id: 'separator1',
+            type: 'separator',
+            parentId: ROOTMENU_ID,
+        });
+
         words.forEach((w, i) => {
             chrome.contextMenus.create({
                 id: i.toString(),
@@ -216,13 +229,6 @@ const listener = (request, sender, sendResponse, voikko) => {
                 onclick: () => replaceWordWithSuggestion(w, sendResponse),
             });
         });
-
-        chrome.contextMenus.create({
-            id: 'separator1',
-            type: 'separator',
-            parentId: ROOTMENU_ID,
-        });
-        createAddWordToDictionaryMenuItem(request.data.word, sendResponse);
 
         chrome.contextMenus.onHidden.addListener(removeMenus);
         chrome.contextMenus.refresh();
@@ -270,7 +276,7 @@ const load = (libvoikko) => {
         listener(request, sender, sendResponse, voikko));
 
     browser.menus.onShown.addListener(setOnOffTitle);
-    createRootmenu();
+    createOnOffMenu();
 };
 
 /**
