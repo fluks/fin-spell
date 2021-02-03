@@ -25,8 +25,6 @@ const onLoad = async (e) => {
         style.innerHTML = `.hwt-content mark.${opts.spellHighlight.class} { ${code} }`;
         document.body.appendChild(style);
     }
-    g_textarea.rows = opts.sidebar_textarea_rows;
-    g_textarea.cols = opts.sidebar_textarea_cols;
 };
 
 g_textarea.addEventListener('input', spell.highlight);

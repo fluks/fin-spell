@@ -5,8 +5,6 @@
 const g_spellSelectorsTextarea = document.querySelector('#spell-selectors'),
     g_spellHighlightInput = document.querySelector('#spell-highlight'),
     g_resetToDefaultsButton = document.querySelector('#reset-to-defaults'),
-    g_sidebarTextareaRows = document.querySelector('#sidebar-textarea-rows'),
-    g_sidebarTextareaCols = document.querySelector('#sidebar-textarea-cols'),
     g_dictionary = document.querySelector('#dictionary'),
     g_enabled = document.querySelector('#enabled'),
     g_disabled = document.querySelector('#disabled'),
@@ -23,9 +21,6 @@ const loadOptions = (options) => {
     g_spellHighlightInput.value = options.spellHighlight.code;
 
     g_spellHighlightClasses.spellHighlight = options.spellHighlight.class;
-
-    g_sidebarTextareaRows.value = options['sidebar_textarea_rows'];
-    g_sidebarTextareaCols.value = options['sidebar_textarea_cols'];
 
     g_dictionary.value = Object.keys(options['dictionary']).sort().join('\n');
 
@@ -48,8 +43,6 @@ const saveOptions = (ev) => {
             code: g_spellHighlightInput.value,
             class: g_spellHighlightClasses.spellHighlight,
         },
-        sidebar_textarea_rows: parseInt(g_sidebarTextareaRows.value),
-        sidebar_textarea_cols: parseInt(g_sidebarTextareaCols.value),
     };
 
     const words = {};

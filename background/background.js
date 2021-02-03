@@ -302,8 +302,6 @@ const setDefaultOptions = (details) => {
         };
 
         // XXX New options here, add to update too.
-        options.sidebar_textarea_rows = 30;
-        options.sidebar_textarea_cols = 50;
         options.dictionary = {};
         options.onOff = {
             enabled: false,
@@ -319,10 +317,6 @@ const setDefaultOptions = (details) => {
         options = {};
         // Add same new options as in the install.
         chrome.storage.local.get(null, (o) => {
-            if (!o.hasOwnProperty('sidebar_textarea_rows'))
-                options['sidebar_textarea_rows'] = 30;
-            if (!o.hasOwnProperty('sidebar_textarea_cols'))
-                options['sidebar_textarea_rows'] = 50;
             if (!o.hasOwnProperty('dictionary'))
                 options['dictionary'] = {};
             if (!o.hasOwnProperty['onOff']) {
@@ -332,7 +326,6 @@ const setDefaultOptions = (details) => {
                     blacklist: [],
                 };
             }
-
         });
     }
     chrome.storage.local.set(options);
